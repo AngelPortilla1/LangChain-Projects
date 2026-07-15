@@ -17,11 +17,6 @@ st.title("Chatbot Básico con LangChain y Streamlit")
 st.markdown("Este es un chatbot básico creado con LangChain y Streamlit.")
 
 
-#Inicializar el historial de mensajes
-
-if "mensajes" not in st.session_state:
-    st.session_state.mensajes = []
-
 #sidebar para configurar el modelo y la temperatura    
 with st.sidebar:
     st.header("Configuración")
@@ -34,6 +29,11 @@ with st.sidebar:
     temperature=temperature)
     idioma = st.radio("Selecciona el idioma de respuesta:", ["Español", "Inglés", "Francés"])
 
+
+#Inicializar el historial de mensajes
+if "mensajes" not in st.session_state:
+    st.session_state.mensajes = []
+
     prompt_template = PromptTemplate(
     input_variables=["mensaje", "historial"],
     template="""Eres un asistente útil y amigable llamado ChatBot StreamlitProSaber. 
@@ -44,10 +44,7 @@ with st.sidebar:
 
     # nueva forma de encadenar el prompt y el modelo
     cadena = prompt_template | chat_model
-    if st.button("🗑️ Nueva conversación"):
-        # ¿Qué necesitas limpiar?
-        st.session_state.mensajes = []
-        st.rerun()  # Esto refresca la página y reinicia la conversación
+
 
     
 
@@ -59,10 +56,13 @@ for msg in st.session_state.mensajes:
 
     role = "assistant" if isinstance(msg, AIMessage) else "user"
 
-
     with st.chat_message(role):
         st.markdown(msg.content)
 
+if st.button("🗑️ Nueva conversación"):
+    # ¿Qué necesitas limpiar?
+    st.session_state.mensajes = []
+    st.rerun()  # Esto refresca la página y reinicia la conversación
 
 #cuadro de entrada de texto de usuario
 pregunta = st.chat_input("Escribe tu mensaje")
@@ -74,22 +74,22 @@ if pregunta:
 
     try:
         with st.chat_message("assistant"):
-            response_placeholder = st.empty()
+            response_placeholder = st.empty() #se va a ir actualizando en tiempo de ejecucion
             full_response = ""
  
-            # ¡Aquí está la magia del streaming!
+            # streaming! de la respuesta
             for chunk in cadena.stream({"mensaje": pregunta, "historial": st.session_state.mensajes,"idioma": idioma}):
                 full_response += chunk.content
                 response_placeholder.markdown(full_response + "▌")  # El cursor parpadeante
             
             response_placeholder.markdown(full_response)
         
-        # No olvides almacenar los mensajes
+        # almacenar los mensajes en el historial de la sesión
         st.session_state.mensajes.append(HumanMessage(content=pregunta))
         st.session_state.mensajes.append(AIMessage(content=full_response))
         
     except Exception as e:
-        # ¿Qué tipo de errores podrían ocurrir aquí?
+
         st.error(f"Error al generar respuesta: {str(e)}")
         st.info("Verifica que tu API Key de OpenAI esté configurada correctamente.")
 
