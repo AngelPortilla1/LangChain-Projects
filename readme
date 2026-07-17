@@ -1,0 +1,55 @@
+# Curso: Agentes con LangChain y LangGraph
+
+Resumen breve
+---------------
+Material de apoyo y ejemplos prácticos para el curso de Udemy sobre creación y despliegue de agentes conversacionales usando LangChain y LangGraph.
+
+Requisitos
+----------
+- Python 3.8+
+- pip
+- Cuenta y claves de proveedor(es) de LLM (OpenAI, o cualquier otro compatible)
+
+Instalación rápida
+------------------
+1. Crear y activar un entorno virtual:
+	python -m venv venv
+	venv\Scripts\activate  (Windows)
+
+2. Instalar dependencias (ejemplo):
+	pip install -r requirements.txt
+
+Estructura del repositorio
+--------------------------
+- notebooks/      : Notebooks con ejemplos paso a paso
+- examples/       : Scripts de demostración de agentes y flujos
+- src/            : Código fuente reutilizable
+- README.md        : Documentación (este archivo)
+- requirements.txt : Dependencias del proyecto
+
+Uso básico
+---------
+1. Configurar variables de entorno con las claves de la API:
+	export OPENAI_API_KEY="tu_clave"  (o set en Windows)
+
+2. Ejecutar ejemplo simple:
+	python examples/simple_agent.py
+
+Buenas prácticas
+----------------
+- Mantener las claves fuera del repositorio (usar .env o variables de entorno).
+- Versionar modelos y dependencias para reproducibilidad.
+- Añadir tests para flujos críticos de conversación.
+
+Recursos
+--------
+- Documentación LangChain: https://langchain.readthedocs.io/
+- LangGraph: verificar documentación oficial y ejemplos en su repositorio.
+
+Licencia
+--------
+Contenido del curso y ejemplos sujetos a la licencia especificada en el repositorio o en el material del curso.
+
+Contacto
+-------
+Para dudas sobre el material, usar los canales del curso en Udemy.
