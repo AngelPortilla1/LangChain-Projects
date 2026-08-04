@@ -1,8 +1,10 @@
 from langchain_core.runnables import RunnableLambda
 from langchain_openai import ChatOpenAI
-
+from dotenv import load_dotenv
+from pathlib import Path
 import json
-
+dotenv_path = Path(__file__).parent.parent / "Tema1" / ".env"
+load_dotenv(dotenv_path)
 #configuracion del modelo: 
 
 chat = ChatOpenAI(model="deepseek-chat",
@@ -60,3 +62,4 @@ process = RunnableLambda(process_one)
 
 
 chain = preprocessor | process
+
