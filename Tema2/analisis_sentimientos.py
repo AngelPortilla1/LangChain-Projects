@@ -76,15 +76,20 @@ parallel_analysis = RunnableParallel({
 
 chain = preprocessor | parallel_analysis | merger
 
-# Prueba con diferentes textos
-textos_prueba = [
-    "¡Me encanta este producto! Funciona perfectamente y llegó muy rápido.",
-    "El servicio al cliente fue terrible, nadie me ayudó con mi problema.",
-    "El clima está nublado hoy, probablemente llueva más tarde."
+reviews_batch = [
+    "Me encantó el producto, superó mis expectativas.",
+    "El servicio fue terrible, no lo recomiendo.",
+    "Es un producto promedio, nada especial.",
+    "Excelente calidad y atención al cliente.",
+    "No me gustó, esperaba más por el precio."
 ]
- 
-for texto in textos_prueba:
-    resultado = chain.invoke(texto)
-    print(f"Texto: {texto}")
-    print(f"Resultado: {resultado}")
-    print("-" * 50)
+
+
+#Con .batch langchain va a procesar muchos elementos al tiempo
+resultado_batch = chain.batch(reviews_batch)
+
+
+
+#json.dumps() significa "dump string": convierte un objeto de Python en una cadena de texto (string) con formato JSON.
+
+print(json.dumps(resultado_batch, indent=4, ensure_ascii=False))
