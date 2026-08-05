@@ -1,10 +1,19 @@
-from langchain_core.runnables import RunnableLambda
+from langchain_core.runnables import RunnableLambda, RunnableParallel, RunnableSequence
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 from pathlib import Path
 import json
+import os
+
 dotenv_path = Path(__file__).parent.parent / "Tema1" / ".env"
 load_dotenv(dotenv_path)
+
+
+
+
+print(os.getenv("OPENAI_API_KEY"))
+
+
 #configuracion del modelo: 
 
 chat = ChatOpenAI(model="deepseek-chat",
@@ -27,6 +36,8 @@ def generate_summary(text):
     return response.content
 
 
+summary_branc = RunnableLambda(generate_summary)
+
 def analyze_sentiment(text):
     """Analiza el sentimiento y devuelve el resultado estructurado"""
     prompt = f"""Analiza el sentimiento del siguiente texto.
@@ -42,6 +53,8 @@ def analyze_sentiment(text):
         return {"sentimiento": "neutro", "razon": "Error en análisis"}
 
 
+sentiment_branch = RunnableLambda(analyze_sentiment)
+
 def merge_results(data):
     """Combina los resultados de ambas ramas en un formato unificado"""
     return {
@@ -49,17 +62,29 @@ def merge_results(data):
         "sentimiento": data["sentimiento_data"]["sentimiento"],
         "razon": data["sentimiento_data"]["razon"]
     }
-def process_one(t):
-    resumen = generate_summary(t)              # Llamada 1 al LLM
-    sentimiento_data = analyze_sentiment(t)    # Llamada 2 al LLM
-    return merge_results({
-        "resumen": resumen,
-        "sentimiento_data": sentimiento_data
-    })
+
+
+merger = RunnableLambda(merge_results)
+
+
+
+parallel_analysis = RunnableParallel({
+    "resumen" :summary_branc,
+    "sentimiento_data" :sentiment_branch
+})
+
+
+chain = preprocessor | parallel_analysis | merger
+
+# Prueba con diferentes textos
+textos_prueba = [
+    "¡Me encanta este producto! Funciona perfectamente y llegó muy rápido.",
+    "El servicio al cliente fue terrible, nadie me ayudó con mi problema.",
+    "El clima está nublado hoy, probablemente llueva más tarde."
+]
  
-# Convertir en Runnable
-process = RunnableLambda(process_one)
-
-
-chain = preprocessor | process
-
+for texto in textos_prueba:
+    resultado = chain.invoke(texto)
+    print(f"Texto: {texto}")
+    print(f"Resultado: {resultado}")
+    print("-" * 50)
