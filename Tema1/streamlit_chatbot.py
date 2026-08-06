@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from langchain_core.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import (
     AIMessage,
@@ -22,6 +22,11 @@ with st.sidebar:
     st.header("Configuración")
     temperature = st.slider("Temperatura", 0.0, 1.0, 0.5, 0.1)
     model_name = st.selectbox("Modelo", ["deepseek-v4-pro", "deepseek-v4-flash"])
+
+
+    #Nueva personalidad configurables 
+
+    personalidad = st.select_box("Selecciona la personalidad del chatbot:", ["Amigable", "Profesional", "Experto", "Divertido"])
     
     #recreando el modelo con los parametros seleccionados
     chat_model = ChatOpenAI(model=model_name,
@@ -30,20 +35,26 @@ with st.sidebar:
     idioma = st.radio("Selecciona el idioma de respuesta:", ["Español", "Inglés", "Francés"])
 
 
+    system_message =   {"Útil y amigable": "Eres un asistente útil y amigable llamado ChatBot Pro. Responde de manera clara y concisa.",
+                        "Profesional y formal": "Eres un asistente profesional y formal. Proporciona respuestas precisas y bien estructuradas.",
+                        "Casual y relajado": "Eres un asistente casual y relajado. Habla de forma natural y amigable, como un buen amigo.",
+                        "Experto técnico": "Eres un asistente experto técnico. Proporciona respuestas detalladas con precisión técnica.",
+                        "Creativo y divertido": "Eres un asistente creativo y divertido. Usa analogías, ejemplos creativos y mantén un tono alegre."
+}
 #Inicializar el historial de mensajes
 if "mensajes" not in st.session_state:
     st.session_state.mensajes = []
 
-    prompt_template = PromptTemplate(
-    input_variables=["mensaje", "historial"],
-    template="""Eres un asistente útil y amigable llamado ChatBot StreamlitProSaber. 
-    Historial de conversación:
-    {historial}
-    Responde de manera clara y sobre todo amigable a la siguiente pregunta: {mensaje}"""
+    chat_prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", system_message[personalidad]),
+            ("human", "Historial de conversación:\n{historial}\n\nResponde de manera clara y sobre todo amigable a la siguiente pregunta: {mensaje}")
+        ]
     )
+    
 
     # nueva forma de encadenar el prompt y el modelo
-    cadena = prompt_template | chat_model
+    cadena = chat_prompt | chat_model
 
 
     
