@@ -1,6 +1,6 @@
 from langchain_core.prompts import PromptTemplate
 
-template = "Eres un experto en marketin. Sguiere un eslogan creativo para un producto {producto}"
+template = "Eres un experto en marketin. Sugiere un eslogan creativo para un producto {producto}"
 
 
 prompt = PromptTemplate(
@@ -9,4 +9,6 @@ prompt = PromptTemplate(
 )
 
 
-prompt_lleno = prompt.format()
+prompt_lleno = prompt.format(producto = "Zapatos deportivos")
+
+print(prompt_lleno)
